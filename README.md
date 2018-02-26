@@ -1,21 +1,7 @@
-# node爬虫：送你一大波美腿图
+# node爬虫：送你一大波美图
 
-今天小年，祭灶、迎春、大扫除迎新春。我也来送福利啦！
+来吧，我们先来看看今天的目标: mmjpg.com的各个频道下的图片
 
-<!-- ![](https://user-gold-cdn.xitu.io/2018/2/8/16175ba45c378086?w=690&h=474&f=jpeg&s=52451) -->
-
-然而这个公众号不像别的公众号那么豪气送不起书😅，就决定送大家一套美图。但是授之以鱼不如授之以渔，我们就来使用node实现个小爬虫去爬取各种美女
-
-来吧，我们先来看看今天的目标: mmjpg.com的美腿频道下的图片
-
-
-![](https://user-gold-cdn.xitu.io/2018/2/8/16175beabb0b35b2)
-
-
-
-在开始之前先来科普科普
-
-> 美腿是形容女性美丽、性感、修长的腿形美。美腿可以分为白璧无瑕的大腿美、晶莹剔透的小腿美、细微的美足、健康明朗的腿形美。所谓腿健美，是指腿部的线条美。腿的长短与肥瘦是决定腿部美丑的两大因素。
 
 ## 一、实现步骤
 
@@ -23,8 +9,7 @@
 2. 使用superagent库来获取页面
 3. 分析页面结构，使用cheerio 获取有效信息
 4. 保存图片到本地
-5. 开撸
-6. 不断优化
+5. 不断优化
 
 
 ## 二、开始编写爬取妹子图的爬虫
@@ -85,21 +70,6 @@ async function getUrl() {
 
 getUrl()
 
-/* console
-$ node app.js
-大美女尹菲开档网袜写真令人眼花缭乱 http://www.mmjpg.com/mm/1230
-宅男女神丰满诱人的胴体令人想入非非 http://www.mmjpg.com/mm/1164
-性感美女浴室写真高耸的酥胸诱惑十足 http://www.mmjpg.com/mm/1162
-长相清纯甜美的97年妹子苗条美腿图片 http://www.mmjpg.com/mm/1157
-丽质美女柔美修长美腿带给你曼妙感受 http://www.mmjpg.com/mm/1153
-容貌似杨幂的美女馨怡美腿极致诱惑图 http://www.mmjpg.com/mm/1148
-丝袜美腿诱惑!甜美女神杨晨晨私房套图 http://www.mmjpg.com/mm/1130
-性感美女刘钰儿透视内衣私密照真撩人 http://www.mmjpg.com/mm/1127
-肤白貌美的模特李晨晨十分惹人怜爱 http://www.mmjpg.com/mm/1126
-萌妹林美惠子穿黑丝浴室私房写真福利 http://www.mmjpg.com/mm/1124
-美女赵小米修长双腿丝袜写真能玩几年 http://www.mmjpg.com/mm/1111
-*/
-```
 
 ### 2.3 分析URL地址
 
@@ -181,24 +151,6 @@ init()
 
 ![](https://user-gold-cdn.xitu.io/2018/2/8/16175bf883f32d93?w=2560&h=1600&f=png&s=227469)
 
-<!-- **一大波美女来袭** -->
-
-
-
-<!-- **前方高能** -->
-
-
-
-
-
-<!-- ![](https://user-gold-cdn.xitu.io/2018/2/8/16175bfd76ce80a5?w=800&h=1200&f=jpeg&s=73509) -->
-
-
-<!-- ![](https://user-gold-cdn.xitu.io/2018/2/8/16175c005757de7a?w=800&h=1200&f=jpeg&s=78307) -->
-
-
-<!-- ![](https://user-gold-cdn.xitu.io/2018/2/8/16175c030e3a04be?w=800&h=1150&f=jpeg&s=160769) -->
-
 
 
 到此这个小爬虫就算写完了，但是这只是一个很简陋的爬虫，还有很多需要改进的地方
@@ -227,6 +179,7 @@ init()
 
 ---
 来更新了
+
 
 在上面我们只能获取到一个标签所代表的一系列图
 
@@ -288,3 +241,149 @@ async function getSeriesImg(url, seriesName) {
     }
 }
 ```
+
+现在我们一个个遍历标签对象
+
+```javascript
+
+let url = 'http://www.mmjpg.com/tag/meitui/'
+
+var baseURL = 'http://www.mmjpg.com/tag/';
+var seriesName = '';
+
+async function init(url) {
+    var tagObj = await getAllTag('http://www.mmjpg.com/more/');
+
+    var keys = Object.keys(tagObj);
+    var len = keys.length;
+
+    var key = '';
+    var n = '';
+
+    // for (var n in tagObj) {
+    for (var i = 0; i < 100; i++) {
+        // if (tagObj.hasOwnProperty(n)) {
+        key = keys[rand(0, len - 1)];
+        url = baseURL + key + '/';
+        seriesName = tagObj[key];
+        console.log(`正在下载${seriesName}套图：${url}`);
+        await getSeriesImg(url, seriesName);
+        // }
+    }
+}
+
+init(url)
+
+```
+
+取到标签页当中的一系列图集
+
+```javascript
+
+/**
+ * 获取图集的URL
+ */
+async function getUrl(url) {
+    let linkArr = []
+    var res = await request.get(url + 1)
+    var $ = cheerio.load(res.text)
+
+    let text = $('.page .info').text()
+    text = text.replace('共', '').replace('页', '')
+    let pageNum = Number(text) || 10;
+    console.log(`共${pageNum}页`)
+
+    for (let i = 1; i <= pageNum; i++) {
+        res = await request.get(url + i)
+        $ = cheerio.load(res.text)
+        $('.pic ul li').each(function(i, elem) {
+            let link = $(this).find('a').attr('href')
+            linkArr.push(link)
+        })
+    }
+    return linkArr
+}
+
+//检测文件或者文件夹存在
+function fsExistsSync(path) {
+    try {
+        fs.accessSync(path, fs.F_OK);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+```
+
+遍历图集中的所有图片
+
+```javascript
+/**
+ * 获取图集中的图片
+ * @param {string} url 图集URL
+ */
+async function getPic(url, seriesName) {
+    const res = await request.get(url)
+    const $ = cheerio.load(res.text)
+    // 以图集名称来分目录  
+    const dir = $('.article h2').text()
+
+    // 套图名
+    var dirSeriesName = path.join(__dirname, '/mm/', seriesName);
+    // 套图下面的子文件夹
+    var dirChildName = path.join(__dirname, '/mm/', seriesName, dir);
+    if (fsExistsSync(dirSeriesName)) {
+        if (fsExistsSync(dirChildName) && dir !== '') {
+            console.log('文件夹已存在！');
+            return;
+        } else {
+            console.log(`创建${dirChildName}文件夹`)
+            await fs.mkdir(dirChildName)
+        }
+    } else {
+        console.log(`创建系列${dirSeriesName}文件夹`)
+        await fs.mkdir(dirSeriesName)
+
+        if (fsExistsSync(dirChildName) && dir == '') {
+            console.log('文件夹已存在！');
+            return;
+        } else {
+            console.log(`创建${dirChildName}文件夹`)
+            await fs.mkdir(dirChildName)
+        }
+    }
+
+
+    const pageCount = parseInt($('#page .ch.all').prev().text()) || 10;
+    console.log(`共${pageCount}张图片`);
+    for (let i = 1; i <= pageCount; i++) {
+        let pageUrl = url + '/' + i
+        console.log('正在请求：', pageUrl);
+        const data = await request.get(pageUrl)
+        const _$ = cheerio.load(data.text)
+        // 获取图片的真实地址
+        const imgUrl = _$('#content img').attr('src')
+        await download(seriesName, dir, imgUrl, dirChildName, pageCount)
+        await sleep(random(300, 600))
+    }
+    console.log(`该图集${pageCount}张图片已下载完成：${dir}`);
+}
+```
+
+将图片下载下来
+
+```javascript
+// 下载图片
+function download(seriesName, dir, imgUrl, dirChildName, pageCount) {
+    console.log(`正在下载${imgUrl}，共${pageCount}张图片`)
+    const filename = imgUrl.split('/').pop()
+    const req = request.get(imgUrl)
+        .set({ 'Referer': 'http://www.mmjpg.com' })
+    req.pipe(fs.createWriteStream(path.join(__dirname, 'mm', seriesName, dir, filename)))
+    // req.pipe(fs.createWriteStream(path.join(dirChildName, filename)))
+}
+```
+
+到这一步，所有的图片集就都下载完成啦
+
