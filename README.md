@@ -2,7 +2,7 @@
 
 今天小年，祭灶、迎春、大扫除迎新春。我也来送福利啦！
 
-![](https://user-gold-cdn.xitu.io/2018/2/8/16175ba45c378086?w=690&h=474&f=jpeg&s=52451)
+<!-- ![](https://user-gold-cdn.xitu.io/2018/2/8/16175ba45c378086?w=690&h=474&f=jpeg&s=52451) -->
 
 然而这个公众号不像别的公众号那么豪气送不起书😅，就决定送大家一套美图。但是授之以鱼不如授之以渔，我们就来使用node实现个小爬虫去爬取各种美女
 
@@ -181,26 +181,25 @@ init()
 
 ![](https://user-gold-cdn.xitu.io/2018/2/8/16175bf883f32d93?w=2560&h=1600&f=png&s=227469)
 
-**一大波美女来袭**
+<!-- **一大波美女来袭** -->
 
 
 
-**前方高能**
+<!-- **前方高能** -->
 
 
 
 
 
-![](https://user-gold-cdn.xitu.io/2018/2/8/16175bfd76ce80a5?w=800&h=1200&f=jpeg&s=73509)
+<!-- ![](https://user-gold-cdn.xitu.io/2018/2/8/16175bfd76ce80a5?w=800&h=1200&f=jpeg&s=73509) -->
 
 
-![](https://user-gold-cdn.xitu.io/2018/2/8/16175c005757de7a?w=800&h=1200&f=jpeg&s=78307)
+<!-- ![](https://user-gold-cdn.xitu.io/2018/2/8/16175c005757de7a?w=800&h=1200&f=jpeg&s=78307) -->
 
 
-![](https://user-gold-cdn.xitu.io/2018/2/8/16175c030e3a04be?w=800&h=1150&f=jpeg&s=160769)
+<!-- ![](https://user-gold-cdn.xitu.io/2018/2/8/16175c030e3a04be?w=800&h=1150&f=jpeg&s=160769) -->
 
 
-源码：https://github.com/ogilhinn/mm-spider
 
 到此这个小爬虫就算写完了，但是这只是一个很简陋的爬虫，还有很多需要改进的地方
 
@@ -217,7 +216,6 @@ init()
 
 ## 三、参考链接
 
-- 源码：https://github.com/ogilhinn/mm-spider
 - superagent： http://visionmedia.github.io/superagent/
 - cheerio：https://github.com/cheeriojs/cheerio
 - fs-extra：https://github.com/jprichardson/node-fs-extra
@@ -227,4 +225,66 @@ init()
 
 **左手代码右手砖，抛砖引玉**
 
-![JavaScript之禅](https://user-gold-cdn.xitu.io/2017/12/2/16014b551df70a85)
+---
+来更新了
+
+在上面我们只能获取到一个标签所代表的一系列图
+
+我们可以想个办法去获取到所有标签对应的一系列图集
+
+
+http://www.mmjpg.com/more/
+
+在这个里面总共有337个标签，每个标签大概有1~464套图，我们分别为不同标签创建文件夹，并将对应图集下载下来
+
+```javascript
+// 取到所有标签对象
+async function getAllTag(addr) {
+    const res = await request.get(addr)
+    const $ = cheerio.load(res.text)
+
+    var ele = $('.tag ul li');
+
+    var childArr = ele;
+    console.log(childArr.length);
+
+    var tagObj = {};
+
+    var aEle = '';
+    var href = '';
+    var tag = '';
+    var name = '';
+
+    $('.tag ul li').each(function(i, elem) {
+        $aEle = $(this).find('a');
+        href = $aEle.attr('href');
+        // console.log(href);
+
+        tag = href.split('tag/')[1];
+        name = $aEle.text();
+
+        tagObj[tag] = name;
+    })
+
+    // console.log(tagObj);
+    return tagObj;
+}
+
+// 取得的对象示例
+// tagObj = {
+//     'ailin': "琳琳"
+//     'angle': "小甜"
+// }
+
+```
+
+根据系列名来下载对应的一套图集
+
+```javascript
+async function getSeriesImg(url, seriesName) {
+    let urls = await getUrl(url);
+    for (let address of urls) {
+        await getPic(address, seriesName)
+    }
+}
+```
