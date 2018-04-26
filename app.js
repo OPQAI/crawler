@@ -105,7 +105,6 @@ function download(seriesName, dir, imgUrl, dirChildName, pageCount) {
     const req = request.get(imgUrl)
         .set({ 'Referer': 'http://www.mmjpg.com' })
     req.pipe(fs.createWriteStream(path.join(__dirname, 'mm', seriesName, dir, filename)))
-    // req.pipe(fs.createWriteStream(path.join(dirChildName, filename)))
 }
 
 // async 表示这是一个async函数，await只能用在这个函数里面。即 await只能在async函数中运行
