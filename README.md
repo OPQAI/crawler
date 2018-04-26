@@ -387,3 +387,14 @@ function download(seriesName, dir, imgUrl, dirChildName, pageCount) {
 
 到这一步，所有的图片集就都下载完成啦
 
+如果你有安装forever的话，运行以下命令即可持续获取所有图集
+
+```bash
+forever app.js
+```
+
+如果你有安装pm2的话，你可以运行这个：
+```bash
+pm2 start app.js -i 3 # 开启三个进程
+pm2 start app.js -i max # 根据机器CPU核数，开启对应数目的进程
+```
